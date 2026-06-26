@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "correctover": {
+      "command": "npx",
+      "args": ["-y", "correctover-mcp-server"],
+      "env": {
+        "DEEPSEEK_API_KEY": "sk-your-deepseek-key",
+        "OPENAI_API_KEY": "sk-your-openai-key",
+        "ANTHROPIC_API_KEY": "sk-ant-your-anthropic-key"
+      }
+    }
+  }
+}

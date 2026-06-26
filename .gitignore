@@ -1,0 +1,23 @@
+# Binaries
+correctover-mcp-server
+*.exe
+
+# Build
+/dist/
+/build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Env
+.env
+
+# Go
+vendor/

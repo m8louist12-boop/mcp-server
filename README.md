@@ -1,0 +1,226 @@
+# Correctover MCP Server
+
+<p align="center">
+  <strong>The MCP Reliability Layer for AI</strong><br/>
+  <em>Others deliver messages. We verify the content.</em>
+</p>
+
+<p align="center">
+  <a href="#installation"><img src="https://img.shields.io/badge/install-1%20line%20JSON-blue" alt="Install"></a>
+  <a href="https://github.com/Correctover/mcp-server/stargazers"><img src="https://img.shields.io/github/stars/Correctover/mcp-server" alt="Stars"></a>
+  <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
+</p>
+
+---
+
+## What is this?
+
+Correctover is the **first MCP server that verifies AI outputs in real-time**.
+
+While every other MCP server connects your AI tools to data sources, Correctover sits in the execution path and ensures every LLM response is **correct, complete, and reliable** — before it reaches your editor.
+
+```
+Your AI Tool (Cursor/Claude Desktop/Windsurf)
+        │
+        ▼
+┌─────────────────────────────────┐
+│  Correctover MCP Server         │
+│                                 │
+│  ① Route → picks best provider  │
+│  ② Execute → calls LLM API     │
+│  ③ Verify → 6-dim check        │  ← This is what nobody else does
+│  ④ Heal → auto-fix or failover  │
+│  ⑤ Deliver → verified output    │
+│                                 │
+└─────────────────────────────────┘
+        │
+        ▼
+  LLM Providers (OpenAI / Anthropic / DeepSeek / ...)
+```
+
+## Why you need this
+
+AI APIs don't just fail with HTTP 500. The worst failures are **silent**:
+
+- Response looks valid but contains hallucinated data
+- JSON output is truncated mid-object
+- Provider silently degrades output quality over time
+- Token usage spikes without warning
+
+**Correctover catches all of these.** Every response passes through 6-dimension validation:
+
+| Dimension | What it checks |
+|-----------|---------------|
+| **Structure** | Response has valid choices and non-empty content |
+| **Schema** | Finish reason is valid, output format is complete |
+| **Latency** | Response time within acceptable bounds |
+| **Cost** | Token usage is reasonable (no runaway billing) |
+| **Identity** | Response role is correct (assistant, not system/user) |
+| **Integrity** | No truncation, no broken JSON, no incomplete data |
+
+If validation fails, Correctover **automatically retries or fails over** to another provider — and validates again. This is not simple retry. This is **verified failover**.
+
+> **Failover ≠ Correctover.** Failover switches providers. Correctover switches *and verifies the output is correct before delivering it*.
+
+## Installation
+
+### One-line JSON config
+
+Add to your MCP client config (e.g., `~/.cursor/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "correctover": {
+      "command": "npx",
+      "args": ["-y", "correctover-mcp-server"],
+      "env": {
+        "OPENAI_API_KEY": "sk-...",
+        "DEEPSEEK_API_KEY": "sk-...",
+        "ANTHROPIC_API_KEY": "sk-ant-..."
+      }
+    }
+  }
+}
+```
+
+That's it. No servers to deploy. No dependencies to install. No configuration files to manage.
+
+### Build from source
+
+```bash
+git clone https://github.com/Correctover/mcp-server.git
+cd mcp-server
+go build -o correctover-mcp-server .
+
+# Then in your MCP config:
+# "command": "/path/to/correctover-mcp-server"
+```
+
+## Supported Providers
+
+Configure providers via environment variables. Only configured providers are active.
+
+| Provider | Env Variable | Default Model |
+|----------|-------------|---------------|
+| OpenAI | `OPENAI_API_KEY` | gpt-4o-mini |
+| Anthropic | `ANTHROPIC_API_KEY` | claude-3-haiku-20240307 |
+| DeepSeek | `DEEPSEEK_API_KEY` | deepseek-chat |
+| Moonshot | `MOONSHOT_API_KEY` | moonshot-v1-8k |
+| Zhipu AI | `ZHIPU_API_KEY` | glm-4-flash |
+| Alibaba Qwen | `DASHSCOPE_API_KEY` | qwen-turbo |
+| SiliconFlow | `SILICONFLOW_API_KEY` | deepseek-ai/DeepSeek-V3 |
+| Groq | `GROQ_API_KEY` | llama-3.1-8b-instant |
+| Together AI | `TOGETHER_API_KEY` | meta-llama/Llama-3-8b-chat-hf |
+
+**BYOK (Bring Your Own Key):** Your API keys stay on your machine. Correctover connects directly to providers — no proxy, no middleman, no data leakage.
+
+## Tools
+
+### `chat`
+
+Send a chat message with automatic verification and self-healing.
+
+**Parameters:**
+- `messages` (required): Conversation messages in OpenAI format
+- `model`: Model name or `"auto"` for automatic selection
+- `provider`: Force a specific provider
+- `temperature`: Sampling temperature
+- `max_tokens`: Maximum response tokens
+- `system_prompt`: System prompt to prepend
+
+**Returns:** The LLM response + a validation report showing which dimensions passed/failed.
+
+### `health`
+
+Check which providers are active and ready.
+
+### `providers`
+
+List all supported providers with configuration details.
+
+### `stats`
+
+Show session statistics: total calls, validation pass rate, failover count.
+
+## Example Output
+
+Every `chat` call returns a validation report:
+
+```
+╔══════════════════════════════════════╗
+║   Correctover Validation Report     ║
+╠══════════════════════════════════════╣
+║ Provider: deepseek                  ║
+║ Latency:  847ms                     ║
+║ Model:    deepseek-chat             ║
+║ Score:    6/6                       ║
+║ Passed:   true                      ║
+╠══════════════════════════════════════╣
+║ ✅ structure  PASS                   ║
+║ ✅ schema     PASS                   ║
+║ ✅ latency    PASS                   ║
+║ ✅ cost       PASS                   ║
+║ ✅ identity   PASS                   ║
+║ ✅ integrity  PASS                   ║
+╠══════════════════════════════════════╣
+║ ✓ All dimensions passed              ║
+╚══════════════════════════════════════╝
+```
+
+## How it works
+
+1. **Route** — Selects the best available provider based on priority and health
+2. **Execute** — Sends the request to the selected provider
+3. **Verify** — Validates the response across 6 dimensions
+4. **Heal** — If validation fails: auto-retries with same provider, or fails over to next provider, then re-validates
+5. **Deliver** — Returns the verified response with a full validation report
+
+This is the **MAPE-K control loop** (Monitor-Analyze-Plan-Execute-Knowledge) applied to LLM API reliability, running in real-time at sub-millisecond decision overhead.
+
+## Who is this for?
+
+- **Developers** who use Cursor/Claude Desktop and want more reliable AI responses
+- **Teams** building AI-powered applications who need output guarantees
+- **Enterprises** in regulated industries (finance, legal, healthcare) where AI output errors have real consequences
+- **Anyone** tired of silently wrong AI outputs breaking their workflow
+
+## FAQ
+
+**Q: How is this different from LiteLLM / OpenRouter?**
+A: They route requests. We route + verify outputs. Think of it as the difference between a delivery service and a delivery service with quality inspection.
+
+**Q: Do you store my API keys?**
+A: No. Keys stay on your machine. We connect directly to providers. Zero proxy, zero data collection.
+
+**Q: Does this work with Cursor?**
+A: Yes. Add the JSON config above to `~/.cursor/mcp.json` and restart Cursor. Done.
+
+**Q: What if I only have one provider?**
+A: Still works. You get 6-dimension validation on every response. Failover kicks in when you add more providers later.
+
+## Sponsor
+
+If Correctover saves you from a silent AI failure, consider supporting:
+
+- ☕ **$5/month** — Thank you + priority issue responses
+- 🚀 **$29/month** — Private Discord + monthly update briefings
+- 🏢 **$99/month** — Enterprise sponsor, logo on README
+
+**[→ Sponsor on GitHub](https://github.com/sponsors/Correctover)**
+
+## Need Help Integrating?
+
+For team deployments, custom validation rules, or dedicated support:
+
+📧 **correctover@neuralbridge.cn**
+
+## License
+
+Apache-2.0
+
+---
+
+<p align="center">
+  <strong>Because failover switches. Correctover verifies.™</strong>
+</p>
