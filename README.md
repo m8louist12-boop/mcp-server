@@ -62,6 +62,19 @@ If validation fails, Correctover **automatically retries or fails over** to anot
 
 > **Failover ≠ Correctover.** Failover switches providers. Correctover switches *and verifies the output is correct before delivering it*.
 
+## MCP Protocol Compatibility
+
+This server implements the **Model Context Protocol** specification version `2025-11-25`, using JSON-RPC 2.0 over stdio transport.
+
+The protocol layer uses an adapter pattern — adding new transport types (WebSocket, gRPC) in the future will not affect the core validation engine. We track MCP specification updates closely and test compatibility on every protocol version release.
+
+**Supported features:**
+- ✅ JSON-RPC 2.0 over stdio
+- ✅ `initialize` / `tools/list` / `tools/call` / `notifications`
+- ✅ Multi-tool support (chat, verify, providers, health)
+- 🔜 WebSocket transport (planned)
+- 🔜 Streaming tool results (planned)
+
 ## Installation
 
 ### One-line JSON config
@@ -213,7 +226,7 @@ If Correctover saves you from a silent AI failure, consider supporting:
 
 For team deployments, custom validation rules, or dedicated support:
 
-📧 **correctover@neuralbridge.cn**
+📧 **hello@correctover.com**
 
 ## License
 

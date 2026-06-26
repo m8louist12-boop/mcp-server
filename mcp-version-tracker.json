@@ -1,0 +1,13 @@
+{
+  "current_supported_version": "2025-11-25",
+  "last_checked": "2026-06-26",
+  "latest_stable": "2025-11-25",
+  "latest_rc": "2026-07-28-RC",
+  "history": [
+    {
+      "date": "2026-06-26",
+      "action": "初始建立监控",
+      "note": "README 原写 2025-03-26，发现已过时，需升级到 2025-11-25"
+    }
+  ]
+}

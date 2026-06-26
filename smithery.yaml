@@ -1,0 +1,65 @@
+name: correctover
+description: "The first MCP server that verifies AI outputs in real-time — 6-dimension contract validation (structure, schema, latency, cost, identity, integrity) with automatic self-healing and multi-provider failover."
+version: 1.0.0
+homepage: https://correctover.com
+repository: https://github.com/Correctover/mcp-server
+categories:
+  - ai
+  - developer-tools
+  - reliability
+tags:
+  - mcp
+  - llm
+  - reliability
+  - failover
+  - validation
+  - self-healing
+  - cursor
+  - claude
+  - byok
+  - multi-provider
+tools:
+  - name: chat
+    description: "Send a message through the reliability layer with multi-provider routing, 6-dimension output validation, and automatic self-healing failover"
+  - name: verify
+    description: "Validate any content against 6-dimension contracts (structure, schema, latency, cost, identity, integrity)"
+  - name: providers
+    description: "List all available AI providers with health status and circuit breaker states"
+  - name: health
+    description: "Check overall engine health and session statistics"
+env:
+  - name: OPENAI_API_KEY
+    description: "OpenAI API key"
+    required: false
+  - name: ANTHROPIC_API_KEY
+    description: "Anthropic API key"
+    required: false
+  - name: DEEPSEEK_API_KEY
+    description: "DeepSeek API key"
+    required: false
+  - name: MOONSHOT_API_KEY
+    description: "Moonshot API key"
+    required: false
+  - name: ZHIPU_API_KEY
+    description: "Zhipu AI API key"
+    required: false
+  - name: DASHSCOPE_API_KEY
+    description: "Alibaba DashScope API key"
+    required: false
+  - name: SILICONFLOW_API_KEY
+    description: "SiliconFlow API key"
+    required: false
+  - name: GROQ_API_KEY
+    description: "Groq API key"
+    required: false
+  - name: TOGETHER_API_KEY
+    description: "Together AI API key"
+    required: false
+install:
+  command: npx
+  args:
+    - "-y"
+    - correctover-mcp-server
+build:
+  language: go
+  command: go build -o correctover-mcp-server .

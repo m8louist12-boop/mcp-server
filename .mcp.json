@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "correctover": {
+      "command": "npx",
+      "args": ["-y", "correctover-mcp-server"]
+    }
+  }
+}
