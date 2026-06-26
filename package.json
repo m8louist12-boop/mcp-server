@@ -1,0 +1,24 @@
+{
+  "name": "correctover-mcp-server",
+  "version": "1.0.1",
+  "description": "The first MCP server that verifies AI outputs in real-time with 6-dimension contract validation and multi-provider failover",
+  "main": "index.js",
+  "bin": {
+    "correctover-mcp-server": "./index.js"
+  },
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "keywords": [
+    "mcp",
+    "ai",
+    "reliability",
+    "failover",
+    "validation",
+    "self-healing"
+  ],
+  "author": "Correctover",
+  "license": "MIT",
+  "repository": "https://github.com/Correctover/mcp-server",
+  "mcpName": "io.github.correctover/correctover-mcp-server"
+}
