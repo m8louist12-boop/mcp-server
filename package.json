@@ -1,7 +1,7 @@
 {
   "name": "correctover-mcp-server",
-  "version": "1.0.1",
-  "description": "The first MCP server that verifies AI outputs in real-time with 6-dimension contract validation and multi-provider failover",
+  "version": "1.0.2",
+  "description": "The first MCP server that verifies AI outputs in real-time — 6-dimension contract validation (structure, schema, latency, cost, identity, integrity) with automatic self-healing failover across 9+ LLM providers. BYOK, zero-dependency, one-line JSON config for Cursor, Claude Desktop, Windsurf.",
   "main": "index.js",
   "bin": {
     "correctover-mcp-server": "./index.js"
@@ -11,14 +11,44 @@
   },
   "keywords": [
     "mcp",
-    "ai",
-    "reliability",
+    "mcp-server",
+    "ai-reliability",
+    "llm-validation",
+    "output-verification",
     "failover",
-    "validation",
-    "self-healing"
+    "self-healing",
+    "byok",
+    "cursor",
+    "claude-desktop",
+    "windsurf",
+    "model-context-protocol",
+    "ai-verification",
+    "contract-validation",
+    "multi-provider",
+    "llm-router",
+    "ai-quality",
+    "openai",
+    "anthropic",
+    "deepseek"
   ],
   "author": "Correctover",
-  "license": "MIT",
-  "repository": "https://github.com/Correctover/mcp-server",
-  "mcpName": "io.github.correctover/correctover-mcp-server"
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Correctover/mcp-server.git"
+  },
+  "homepage": "https://correctover.com",
+  "bugs": {
+    "url": "https://github.com/Correctover/mcp-server/issues"
+  },
+  "mcpName": "io.github.correctover/correctover-mcp-server",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "index.js",
+    "install.js",
+    "README.md",
+    "LICENSE"
+  ]
 }

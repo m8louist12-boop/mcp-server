@@ -1,12 +1,15 @@
 name: correctover
-description: "The first MCP server that verifies AI outputs in real-time — 6-dimension contract validation (structure, schema, latency, cost, identity, integrity) with automatic self-healing and multi-provider failover."
-version: 1.0.0
+displayName: "Correctover — AI Output Verification"
+description: "The first MCP server that verifies AI outputs in real-time. Routes LLM calls through 9+ providers with 6-dimension output validation (structure, schema, latency, cost, identity, integrity) and automatic self-healing failover. BYOK — your API keys stay on your machine. One-line JSON config for Cursor, Claude Desktop, Windsurf."
+version: 1.0.2
 homepage: https://correctover.com
 repository: https://github.com/Correctover/mcp-server
+license: Apache-2.0
 categories:
   - ai
   - developer-tools
   - reliability
+  - testing
 tags:
   - mcp
   - llm
@@ -15,18 +18,50 @@ tags:
   - validation
   - self-healing
   - cursor
-  - claude
+  - claude-desktop
+  - windsurf
   - byok
   - multi-provider
+  - output-verification
+  - ai-reliability
+  - contract-validation
+
 tools:
   - name: chat
-    description: "Send a chat message to an LLM with automatic output verification. Routes through the best available provider, validates the response across 6 dimensions (structure, schema, latency, cost, identity, integrity), and auto-heals on failure by retrying or failing over to another provider."
-  - name: verify
-    description: "Validate any content against 6-dimension contracts (structure, schema, latency, cost, identity, integrity)"
-  - name: providers
-    description: "List all available AI providers with health status and circuit breaker states"
+    description: "Send a chat message to an LLM with automatic output verification. Routes through the best available provider, validates the response across 6 dimensions (structure, schema, latency, cost, identity, integrity), and auto-heals on failure by retrying or failing over to another provider. Returns response text plus a validation report."
   - name: health
-    description: "Check overall engine health and session statistics"
+    description: "Check health and availability of all configured LLM providers. Shows which providers are active and ready for routing, with session statistics. Call this first to verify your configuration."
+  - name: providers
+    description: "List all supported LLM providers with their configuration details, default models, base URLs, and current status. Useful for seeing which providers are available and whether custom base URLs are configured."
+  - name: stats
+    description: "Show session statistics: total API calls, validation pass rate, failover count, active providers, and server version. Review reliability metrics after a working session."
+
+prompts:
+  - name: verify-output
+    description: "Verify a specific piece of AI-generated content for correctness, completeness, and reliability across 6 dimensions. Use when you want to check if a response is trustworthy."
+    arguments:
+      - name: content
+        description: "The AI-generated content to verify"
+        required: true
+      - name: expected_format
+        description: "Expected output format (e.g., 'JSON with fields: name, email')"
+        required: false
+  - name: compare-providers
+    description: "Compare responses from multiple LLM providers on the same prompt to identify quality differences, hallucinations, or inconsistencies."
+    arguments:
+      - name: prompt
+        description: "The prompt to send to all providers"
+        required: true
+      - name: providers
+        description: "Comma-separated providers to compare (e.g., 'openai,anthropic'). Empty = all."
+        required: false
+  - name: reliability-audit
+    description: "Run a comprehensive reliability audit on your LLM provider configuration. Tests connectivity, validates API keys, checks response quality, and identifies failure points."
+    arguments:
+      - name: focus
+        description: "Audit focus: 'connectivity', 'quality', 'latency', or 'comprehensive' (default)."
+        required: false
+
 startCommand:
   type: stdio
   configSchema:
@@ -34,31 +69,40 @@ startCommand:
     properties:
       OPENAI_API_KEY:
         type: string
-        description: "OpenAI API key"
+        description: "OpenAI API key for GPT-4o-mini and other GPT models"
       ANTHROPIC_API_KEY:
         type: string
-        description: "Anthropic API key"
+        description: "Anthropic API key for Claude 3 Haiku and other Claude models"
       DEEPSEEK_API_KEY:
         type: string
-        description: "DeepSeek API key"
+        description: "DeepSeek API key for deepseek-chat and deepseek-reasoner"
       MOONSHOT_API_KEY:
         type: string
-        description: "Moonshot / Kimi API key"
+        description: "Moonshot / Kimi API key for moonshot-v1 models"
       ZHIPU_API_KEY:
         type: string
-        description: "Zhipu AI (GLM) API key"
+        description: "Zhipu AI (GLM) API key for glm-4-flash and other GLM models"
       DASHSCOPE_API_KEY:
         type: string
-        description: "Alibaba DashScope (Qwen) API key"
+        description: "Alibaba DashScope (Qwen) API key for qwen-turbo and other Qwen models"
       SILICONFLOW_API_KEY:
         type: string
-        description: "SiliconFlow API key"
+        description: "SiliconFlow API key for DeepSeek-V3 and other models via SiliconFlow"
       GROQ_API_KEY:
         type: string
-        description: "Groq API key"
+        description: "Groq API key for Llama 3 and other models via Groq's ultra-fast inference"
       TOGETHER_API_KEY:
         type: string
-        description: "Together AI API key"
+        description: "Together AI API key for open-source models via Together"
+      OPENAI_BASE_URL:
+        type: string
+        description: "Override OpenAI base URL (for proxy/gateway/mirror)"
+      ANTHROPIC_BASE_URL:
+        type: string
+        description: "Override Anthropic base URL (for proxy/gateway/mirror)"
+      DEEPSEEK_BASE_URL:
+        type: string
+        description: "Override DeepSeek base URL (for proxy/gateway/mirror)"
   commandFunction: |-
     (config) => ({
       "command": "npx",
@@ -72,6 +116,9 @@ startCommand:
         "DASHSCOPE_API_KEY": config.DASHSCOPE_API_KEY || "",
         "SILICONFLOW_API_KEY": config.SILICONFLOW_API_KEY || "",
         "GROQ_API_KEY": config.GROQ_API_KEY || "",
-        "TOGETHER_API_KEY": config.TOGETHER_API_KEY || ""
+        "TOGETHER_API_KEY": config.TOGETHER_API_KEY || "",
+        "OPENAI_BASE_URL": config.OPENAI_BASE_URL || "",
+        "ANTHROPIC_BASE_URL": config.ANTHROPIC_BASE_URL || "",
+        "DEEPSEEK_BASE_URL": config.DEEPSEEK_BASE_URL || ""
       }
     })

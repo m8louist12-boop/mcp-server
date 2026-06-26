@@ -12,22 +12,27 @@ import (
 const (
 	ProtocolVersion = "2025-11-25"
 	ServerName      = "correctover-mcp-server"
-	ServerVersion   = "1.0.0"
+	ServerVersion   = "1.0.2"
 )
 
 type ToolHandler func(args map[string]any) (*ToolCallResult, error)
+type PromptHandler func(args map[string]any) (*PromptGetResult, error)
 
 type Server struct {
-	tools        map[string]Tool
-	handlers     map[string]ToolHandler
-	mu           sync.RWMutex
-	logWriter    io.Writer
+	tools          map[string]Tool
+	handlers       map[string]ToolHandler
+	prompts        map[string]Prompt
+	promptHandlers map[string]PromptHandler
+	mu             sync.RWMutex
+	logWriter      io.Writer
 }
 
 func NewServer() *Server {
 	return &Server{
-		tools:    make(map[string]Tool),
-		handlers: make(map[string]ToolHandler),
+		tools:          make(map[string]Tool),
+		handlers:       make(map[string]ToolHandler),
+		prompts:        make(map[string]Prompt),
+		promptHandlers: make(map[string]PromptHandler),
 	}
 }
 
@@ -47,6 +52,14 @@ func (s *Server) RegisterTool(tool Tool, handler ToolHandler) {
 	s.tools[tool.Name] = tool
 	s.handlers[tool.Name] = handler
 	s.log(fmt.Sprintf("registered tool: %s", tool.Name))
+}
+
+func (s *Server) RegisterPrompt(prompt Prompt, handler PromptHandler) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.prompts[prompt.Name] = prompt
+	s.promptHandlers[prompt.Name] = handler
+	s.log(fmt.Sprintf("registered prompt: %s", prompt.Name))
 }
 
 func (s *Server) Run() error {
@@ -91,6 +104,10 @@ func (s *Server) handleRequest(req *Request) *Response {
 		return s.handleToolsList(req)
 	case "tools/call":
 		return s.handleToolsCall(req)
+	case "prompts/list":
+		return s.handlePromptsList(req)
+	case "prompts/get":
+		return s.handlePromptsGet(req)
 	default:
 		return &Response{
 			JSONRPC: "2.0",
@@ -108,15 +125,29 @@ func (s *Server) handleInitialize(req *Request) *Response {
 		Result: InitializeResult{
 			ProtocolVersion: ProtocolVersion,
 			Capabilities: ServerCaps{
-				Tools: &ToolsCap{ListChanged: false},
+				Tools:   &ToolsCap{ListChanged: false},
+				Prompts: &PromptsCap{ListChanged: false},
 			},
 			ServerInfo: Info{
 				Name:    ServerName,
 				Version: ServerVersion,
 			},
-			Instructions: "Correctover MCP Server — Real-time AI output verification and self-healing. " +
-				"Routes LLM calls through multiple providers with 6-dimension output validation. " +
-				"Configure your API keys via environment variables (OPENAI_API_KEY, ANTHROPIC_API_KEY, DEEPSEEK_API_KEY, etc.).",
+			Instructions: "Correctover is the first MCP server that verifies AI outputs in real-time. " +
+				"It sits between your AI tool (Cursor, Claude Desktop, Windsurf) and LLM providers (OpenAI, Anthropic, DeepSeek, etc.), " +
+				"validating every response across 6 dimensions: structure, schema, latency, cost, identity, and integrity. " +
+				"If validation fails, it automatically retries or fails over to another provider — and validates again.\n\n" +
+				"## When to use which tool:\n" +
+				"- Use **chat** for any LLM interaction — it automatically validates output and self-heals on failure. " +
+				"This is the primary tool for most use cases.\n" +
+				"- Use **health** to check which providers are configured and ready before starting work.\n" +
+				"- Use **providers** to see detailed configuration for all supported providers.\n" +
+				"- Use **stats** to review session statistics after a working session.\n\n" +
+				"## Configuration:\n" +
+				"Set at least one API key via environment variables: OPENAI_API_KEY, ANTHROPIC_API_KEY, DEEPSEEK_API_KEY, etc. " +
+				"Only configured providers are active. Your keys stay on your machine (BYOK — no proxy, no data collection).\n\n" +
+				"## Failover ≠ Correctover:\n" +
+				"Simple failover just switches providers. Correctover switches AND verifies the output is correct before delivering it. " +
+				"Every response passes through 6-dimension validation — if it fails, the engine auto-retries or fails over, then re-validates.",
 		},
 	}
 }
@@ -168,6 +199,63 @@ func (s *Server) handleToolsCall(req *Request) *Response {
 				Content: []Content{TextContent(fmt.Sprintf("Error: %v", err))},
 				IsError: true,
 			},
+		}
+	}
+
+	return &Response{
+		JSONRPC: "2.0",
+		ID:      req.ID,
+		Result:  result,
+	}
+}
+
+func (s *Server) handlePromptsList(req *Request) *Response {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	prompts := make([]Prompt, 0, len(s.prompts))
+	for _, p := range s.prompts {
+		prompts = append(prompts, p)
+	}
+
+	return &Response{
+		JSONRPC: "2.0",
+		ID:      req.ID,
+		Result:  PromptsListResult{Prompts: prompts},
+	}
+}
+
+func (s *Server) handlePromptsGet(req *Request) *Response {
+	var params struct {
+		Name      string         `json:"name"`
+		Arguments map[string]any `json:"arguments,omitempty"`
+	}
+	if err := json.Unmarshal(req.Params, &params); err != nil {
+		return &Response{
+			JSONRPC: "2.0",
+			ID:      req.ID,
+			Error:   &RPCError{Code: -32602, Message: fmt.Sprintf("invalid params: %v", err)},
+		}
+	}
+
+	s.mu.RLock()
+	handler, ok := s.promptHandlers[params.Name]
+	s.mu.RUnlock()
+
+	if !ok {
+		return &Response{
+			JSONRPC: "2.0",
+			ID:      req.ID,
+			Error:   &RPCError{Code: -32602, Message: fmt.Sprintf("unknown prompt: %s", params.Name)},
+		}
+	}
+
+	result, err := handler(params.Arguments)
+	if err != nil {
+		return &Response{
+			JSONRPC: "2.0",
+			ID:      req.ID,
+			Error:   &RPCError{Code: -32603, Message: fmt.Sprintf("prompt error: %v", err)},
 		}
 	}
 
