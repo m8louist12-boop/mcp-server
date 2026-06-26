@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	ProtocolVersion = "2024-11-05"
+	ProtocolVersion = "2025-11-25"
 	ServerName      = "correctover-mcp-server"
 	ServerVersion   = "1.0.0"
 )

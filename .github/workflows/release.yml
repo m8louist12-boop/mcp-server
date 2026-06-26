@@ -41,7 +41,7 @@ jobs:
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
         run: |
-          go build -ldflags="-s -w" -o correctover-${{ matrix.suffix }} ./cmd/correctover/
+          go build -ldflags="-s -w" -o correctover-${{ matrix.suffix }} .
           chmod +x correctover-${{ matrix.suffix }}
 
       - name: Upload artifact

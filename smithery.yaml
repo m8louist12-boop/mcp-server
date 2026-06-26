@@ -47,22 +47,40 @@ env:
     description: "Override DeepSeek base URL (for proxy/mirror)"
     required: false
   - name: MOONSHOT_API_KEY
-    description: "Moonshot API key"
+    description: "Moonshot / Kimi API key"
+    required: false
+  - name: MOONSHOT_BASE_URL
+    description: "Override Moonshot base URL"
     required: false
   - name: ZHIPU_API_KEY
-    description: "Zhipu AI API key"
+    description: "Zhipu AI (GLM) API key"
+    required: false
+  - name: ZHIPU_BASE_URL
+    description: "Override Zhipu base URL"
     required: false
   - name: DASHSCOPE_API_KEY
-    description: "Alibaba DashScope API key"
+    description: "Alibaba DashScope (Qwen) API key"
+    required: false
+  - name: DASHSCOPE_BASE_URL
+    description: "Override DashScope base URL"
     required: false
   - name: SILICONFLOW_API_KEY
     description: "SiliconFlow API key"
     required: false
+  - name: SILICONFLOW_BASE_URL
+    description: "Override SiliconFlow base URL"
+    required: false
   - name: GROQ_API_KEY
     description: "Groq API key"
     required: false
+  - name: GROQ_BASE_URL
+    description: "Override Groq base URL"
+    required: false
   - name: TOGETHER_API_KEY
     description: "Together AI API key"
+    required: false
+  - name: TOGETHER_BASE_URL
+    description: "Override Together base URL"
     required: false
 install:
   command: npx
