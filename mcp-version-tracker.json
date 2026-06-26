@@ -3,11 +3,31 @@
   "last_checked": "2026-06-26",
   "latest_stable": "2025-11-25",
   "latest_rc": "2026-07-28-RC",
+  "monitored_repos": {
+    "spec": {
+      "repo": "modelcontextprotocol/specification",
+      "current": "2025-11-25",
+      "rc": "2026-07-28-RC"
+    },
+    "typescript_sdk": {
+      "repo": "modelcontextprotocol/typescript-sdk",
+      "current": "v1.29.0"
+    },
+    "go_sdk": {
+      "repo": "modelcontextprotocol/go-sdk",
+      "current": "v1.6.1"
+    }
+  },
+  "monitoring": {
+    "track_1": "Claude会话内 CronCreate，每周一 9:07，7天自动续期",
+    "track_2": "Windows系统级 Correctover-MCP-Spec-Monitor 定时任务，永久持久化",
+    "method": "GitHub API 获取三个仓库最新 release tag"
+  },
   "history": [
     {
       "date": "2026-06-26",
       "action": "初始建立监控",
-      "note": "README 原写 2025-03-26，发现已过时，需升级到 2025-11-25"
+      "note": "README 原写 2025-03-26，发现已过时，已升级到 2025-11-25"
     }
   ]
 }
