@@ -1,0 +1,23 @@
+{
+  "$schema": "https://glama.ai/mcp/schemas/server.json",
+  "name": "correctover-mcp-server",
+  "displayName": "Correctover — MCP Reliability Layer",
+  "description": "The first MCP server that verifies AI outputs in real-time. Routes LLM calls through multiple providers with 6-dimension output validation (structure, schema, latency, cost, identity, integrity) and automatic self-healing. BYOK, zero-dependency, one-line JSON config for Cursor/Claude Desktop.",
+  "category": "ai",
+  "tags": ["mcp", "llm", "reliability", "failover", "validation", "self-healing", "cursor", "claude", "byok"],
+  "environmentVariables": {
+    "OPENAI_API_KEY": { "description": "OpenAI API key", "required": false },
+    "ANTHROPIC_API_KEY": { "description": "Anthropic API key", "required": false },
+    "DEEPSEEK_API_KEY": { "description": "DeepSeek API key", "required": false },
+    "MOONSHOT_API_KEY": { "description": "Moonshot API key", "required": false },
+    "ZHIPU_API_KEY": { "description": "Zhipu AI API key", "required": false },
+    "DASHSCOPE_API_KEY": { "description": "Alibaba DashScope API key", "required": false },
+    "GROQ_API_KEY": { "description": "Groq API key", "required": false },
+    "TOGETHER_API_KEY": { "description": "Together AI API key", "required": false },
+    "SILICONFLOW_API_KEY": { "description": "SiliconFlow API key", "required": false }
+  },
+  "build": {
+    "command": "go build -o correctover-mcp-server .",
+    "language": "go"
+  }
+}

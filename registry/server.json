@@ -1,0 +1,32 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schemas/server.json",
+  "name": "correctover-mcp-server",
+  "description": "The MCP Reliability Layer for AI — real-time output verification, 6-dimension contract validation, and automatic self-healing for LLM calls",
+  "version": "1.0.0",
+  "homepage": "https://github.com/Correctover/mcp-server",
+  "repository": "https://github.com/Correctover/mcp-server",
+  "license": "Apache-2.0",
+  "transport": {
+    "type": "stdio"
+  },
+  "tools": [
+    {
+      "name": "chat",
+      "description": "Send a chat message to an LLM with automatic 6-dimension output verification and self-healing failover"
+    },
+    {
+      "name": "health",
+      "description": "Check health and availability of all configured LLM providers"
+    },
+    {
+      "name": "providers",
+      "description": "List all supported LLM providers with configuration details"
+    },
+    {
+      "name": "stats",
+      "description": "Show session statistics: total calls, validation pass rate, failover count"
+    }
+  ],
+  "categories": ["ai", "reliability", "developer-tools"],
+  "keywords": ["mcp", "llm", "reliability", "failover", "validation", "self-healing", "cursor", "byok"]
+}
