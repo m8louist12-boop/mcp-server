@@ -4,7 +4,7 @@
   "description": "MCP Reliability Layer for AI — Real-time LLM output verification and self-healing inside VS Code",
   "version": "1.0.0",
   "publisher": "Correctover",
-  "license": "Apache-2.0",
+  "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
     "url": "https://github.com/Correctover/mcp-server"
@@ -15,20 +15,39 @@
   "engines": {
     "vscode": "^1.95.0"
   },
-  "icon": "media/icon.png",
+  "icon": "media/correctover-icon-256.png",
+  "galleryBanner": {
+    "color": "#0A0A1A",
+    "theme": "dark"
+  },
   "categories": [
-    "Other",
+    "Machine Learning",
     "Programming Languages",
-    "Machine Learning"
+    "Visualization"
   ],
   "keywords": [
     "mcp",
+    "model-context-protocol",
     "llm",
     "ai",
     "validation",
     "correctover",
-    "model-context-protocol"
+    "self-healing",
+    "failover",
+    "llm-routing",
+    "ai-gateway",
+    "reliability",
+    "provider",
+    "openai",
+    "anthropic",
+    "deepseek"
   ],
+  "qna": "https://github.com/Correctover/mcp-server/discussions",
+  "homepage": "https://correctover.com",
+  "sponsor": {
+    "url": "https://github.com/sponsors/Correctover"
+  },
+  "pricing": "Free",
   "activationEvents": [
     "onCommand:correctover.start",
     "onCommand:correctover.stop",
@@ -77,7 +96,7 @@
         "correctover.serverPath": {
           "type": "string",
           "default": "",
-          "description": "Path to the correctover-mcp-server binary. If empty, searches PATH for 'correctover-server'."
+          "description": "Path to the correctover-mcp-server binary. If empty, searches PATH and common locations."
         },
         "correctover.autoStart": {
           "type": "boolean",
@@ -175,12 +194,15 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "package": "vsce package --no-dependencies",
+    "publish": "vsce publish --no-dependencies",
+    "publish:openvsx": "ovsx publish --no-dependencies",
     "lint": "eslint src --ext ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/vscode": "^1.95.0",
     "typescript": "^5.7.0",
-    "@vscode/vsce": "^3.0.0"
+    "@vscode/vsce": "^3.0.0",
+    "ovsx": "^0.10.0"
   }
 }

@@ -1,33 +1,104 @@
 # Correctover MCP — VS Code Extension
 
-**The MCP Reliability Layer for AI.** Real-time LLM output verification and self-healing, running directly inside VS Code.
+<p align="center">
+  <strong>🧠 The MCP Reliability Layer for AI</strong><br/>
+  <em>Validate, verify, and self-heal every LLM response — automatically.</em>
+</p>
 
-## Features
+<p align="center">
+  <a href="https://marketplace.visualstudio.com/items?itemName=Correctover.correctover-vscode">
+    <img src="https://img.shields.io/vscode-marketplace/v/Correctover.correctover-vscode.svg?label=VS%20Code%20Marketplace&color=00E5FF" alt="Marketplace">
+  </a>
+  <a href="https://github.com/Correctover/mcp-server">
+    <img src="https://img.shields.io/github/stars/Correctover/mcp-server?style=flat&label=GitHub%20Stars" alt="Stars">
+  </a>
+  <a href="https://opensource.org/licenses/Apache-2.0">
+    <img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License">
+  </a>
+</p>
 
-- **MCP Server Lifecycle** — Start, stop, and restart the Correctover MCP server from the command palette
-- **Real-time Dashboard** — Sidebar panel showing server status, active providers, and session statistics
-- **Provider Configuration** — Configure API keys (OpenAI, Anthropic, DeepSeek, and 6 more providers) directly in VS Code settings
-- **Status Bar** — At-a-glance server status and call statistics
-- **6-Dimension Output Validation** — Every LLM response is verified for structure, schema, latency, cost, identity, and integrity
-- **Auto-Failover** — If validation fails, automatically retry or fail over to another provider
-- **Built-in MCP Integration** — Registers with VS Code's MCP tool system (VS Code 1.95+)
+---
 
-## Quick Start
+## ✨ Features
 
-1. Install the extension
-2. Open the Command Palette (`Ctrl+Shift+P`) and run **Correctover: Start MCP Server**
-3. Configure at least one API key in VS Code settings (`correctover.*Key`)
-4. Open the **Correctover** sidebar to see the dashboard
+### 🔄 MCP Server Lifecycle
+Start, stop, and restart the Correctover MCP server directly from VS Code's command palette. No terminal needed.
 
-## Requirements
+### 📊 Real-time Dashboard
+Sidebar panel showing:
+- Server status and health
+- Active LLM providers and their models
+- Session statistics: total calls, pass rate, failover count
+- 6-dimension validation report
 
-- **VS Code 1.95+** — The extension uses the latest VS Code API features
-- **correctover-mcp-server binary** — The Go MCP server. Either:
-  - Download the pre-built binary from [GitHub Releases](https://github.com/Correctover/mcp-server/releases)
-  - Build from source: `go build -o correctover-server .` in the mcp-server repo
-  - Set the path in settings: `correctover.serverPath`
+### 🔑 9 Provider Configuration
+Configure API keys in VS Code settings for all major LLM providers:
+- **OpenAI** · **Anthropic** · **DeepSeek** · **Moonshot** · **Zhipu AI**
+- **Alibaba Qwen** · **SiliconFlow** · **Groq** · **Together AI**
 
-## Available Commands
+Proxy/mirror support via base URL overrides.
+
+### 🛡️ 6-Dimension Output Validation
+Every LLM response is verified before it reaches you:
+
+| Dimension    | What it checks                              |
+|--------------|---------------------------------------------|
+| **Structure**  | Valid choices and non-empty content         |
+| **Schema**     | Valid finish reason, complete output        |
+| **Latency**    | Response time within bounds                 |
+| **Cost**       | Token usage is reasonable                   |
+| **Identity**   | Correct response role (assistant)           |
+| **Integrity**  | No truncation, no broken JSON               |
+
+### ⚡ Auto-Failover
+If validation fails: automatically retries with the same provider, or fails over to another provider — and re-validates.
+
+> **Failover ≠ Correctover.** Failover switches providers. Correctover switches *and verifies the output is correct before delivering it*.
+
+### 🔌 Built-in MCP Integration
+Registers with VS Code's native MCP tool system (VS Code 1.95+). Your AI tools can call Correctover directly.
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- **VS Code 1.95+**
+- **correctover-mcp-server binary** — The Go MCP server
+
+### Install the Server Binary
+
+**Option A: Download pre-built binary**
+```bash
+# Download from GitHub Releases
+curl -LO https://github.com/Correctover/mcp-server/releases/latest/download/correctover-windows-amd64.exe
+# Rename to correctover-server.exe and place in PATH
+```
+
+**Option B: Build from source**
+```bash
+git clone https://github.com/Correctover/mcp-server.git
+cd mcp-server
+go build -o correctover-server.exe .
+```
+
+**Option C: Set custom path**
+Set `correctover.serverPath` in VS Code settings to your binary location.
+
+### Configure API Keys
+1. Open VS Code Settings (`Ctrl+,`)
+2. Search for `correctover.openaiKey` (or any provider)
+3. Enter your API key(s)
+4. Only configured providers will be active
+
+### Start the Server
+1. Press `Ctrl+Shift+P` to open the Command Palette
+2. Run **Correctover: Start MCP Server**
+3. Open the **Correctover** sidebar to see the dashboard
+
+---
+
+## 📖 Available Commands
 
 | Command | Description |
 |---------|-------------|
@@ -39,20 +110,68 @@
 | `Correctover: Show Session Stats` | Display session statistics |
 | `Correctover: Configure Providers` | Open provider settings |
 
-## Extension Settings
+---
 
-| Setting | Description |
-|---------|-------------|
-| `correctover.serverPath` | Path to the correctover-mcp-server binary |
-| `correctover.autoStart` | Auto-start server when VS Code launches |
-| `correctover.*Key` | API keys for each supported LLM provider |
-| `correctover.*BaseUrl` | Base URL overrides for proxies/mirrors |
-| `correctover.enableMcpIntegration` | Register with VS Code's built-in MCP system |
+## ⚙️ Extension Settings
 
-## Supported Providers
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `correctover.serverPath` | Path to the MCP server binary | Auto-detect |
+| `correctover.autoStart` | Auto-start server on launch | `false` |
+| `correctover.*Key` | API keys for LLM providers | `""` |
+| `correctover.*BaseUrl` | Base URL overrides for proxies | `""` |
+| `correctover.enableMcpIntegration` | Register with VS Code MCP system | `true` |
 
-OpenAI · Anthropic · DeepSeek · Moonshot · Zhipu AI · Alibaba Qwen · SiliconFlow · Groq · Together AI
+---
 
-## License
+## 📊 Example Dashboard
 
-Apache-2.0
+When running, the sidebar dashboard shows:
+
+```
+┌─ Correctover Dashboard ─────────────────┐
+│ ● Running    Server is active            │
+│                                          │
+│ Session Statistics:                      │
+│   Calls: 42  │  Passed: 41  │  97.6%    │
+│   Failovers: 1                           │
+│                                          │
+│ Active Providers:                        │
+│   ✅ openai        model: gpt-4o-mini    │
+│   ✅ deepseek      model: deepseek-chat  │
+│   ✅ anthropic     model: claude-3-haiku │
+└──────────────────────────────────────────┘
+```
+
+---
+
+## 🏢 Commercial Use
+
+The VS Code extension is **free** (Apache 2.0). It connects to the Correctover MCP server which validates LLM outputs using your own API keys.
+
+For teams needing:
+- Custom validation rules
+- Advanced self-healing strategies  
+- SLA guarantees
+- On-premise deployment
+
+→ **[correctover.com](https://correctover.com)**
+
+---
+
+## 🔗 Resources
+
+- **[GitHub Repository](https://github.com/Correctover/mcp-server)** — Source code, issues, releases
+- **[Correctover Website](https://correctover.com)** — Product info, pricing, enterprise
+- **[Documentation](https://github.com/Correctover/mcp-server/tree/main/docs)** — API examples, architecture docs
+- **[Sponsor](https://github.com/sponsors/Correctover)** — Support development
+
+---
+
+## 📝 License
+
+Apache 2.0 — See [LICENSE](LICENSE) for details.
+
+<p align="center">
+  <sub>Because failover switches. Correctover verifies.™</sub>
+</p>
