@@ -1,0 +1,100 @@
+name: Publish VS Code Extension
+
+on:
+  push:
+    tags:
+      - 'vscode-v*'   # e.g. vscode-v1.0.0 triggers extension publish
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version bump type (patch/minor/major)'
+        required: true
+        default: 'patch'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: vscode-extension
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile TypeScript
+        run: npm run compile
+
+      - name: Lint
+        run: npm run lint || true
+
+      - name: Package VSIX
+        run: npx vsce package --no-dependencies --out correctover-vscode-${{ github.ref_name }}.vsix
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: correctover-vscode-${{ github.ref_name }}
+          path: vscode-extension/correctover-vscode-${{ github.ref_name }}.vsix
+
+      - name: Publish to VS Code Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          if [ -n "$VSCE_PAT" ]; then
+            npx vsce publish --no-dependencies --pat "$VSCE_PAT"
+          else
+            echo "⚠️ VSCE_PAT not set — skipping VS Code Marketplace publish"
+            echo "   Set it in GitHub repo secrets: https://github.com/Correctover/mcp-server/settings/secrets"
+          fi
+
+      - name: Publish to Open VSX Registry
+        env:
+          OPEN_VSX_TOKEN: ${{ secrets.OPEN_VSX_TOKEN }}
+        run: |
+          if [ -n "$OPEN_VSX_TOKEN" ]; then
+            npx ovsx publish --no-dependencies --pat "$OPEN_VSX_TOKEN"
+          else
+            echo "⚠️ OPEN_VSX_TOKEN not set — skipping Open VSX publish"
+            echo "   Set it in GitHub repo secrets"
+          fi
+
+  # Also attach VSIX to GitHub Release when a tag is pushed
+  attach-to-release:
+    needs: publish
+    if: startsWith(github.ref, 'refs/tags/vscode-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download VSIX
+        uses: actions/download-artifact@v4
+        with:
+          name: correctover-vscode-${{ github.ref_name }}
+          path: dist
+
+      - name: Attach to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.vsix
+          append_body: true
+          body: |
+            ## Correctover VS Code Extension ${{ github.ref_name }}
+
+            ### Install via VS Code
+            1. Download the `.vsix` file below
+            2. VS Code → Extensions → `...` → Install from VSIX...
+            3. Select the downloaded file
+
+            ### Install from Marketplace
+            Search "Correctover MCP" in VS Code extensions panel, or visit:
+            https://marketplace.visualstudio.com/items?itemName=Correctover.correctover-vscode
